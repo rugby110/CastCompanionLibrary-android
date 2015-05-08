@@ -174,6 +174,7 @@ public class VideoCastManager extends BaseCastManager
             new CopyOnWriteArraySet<>();
     private MediaAuthService mAuthService;
     private long mLiveStreamDuration = DEFAULT_LIVE_STREAM_DURATION_MS;
+    private MediaRouteDialogListener mMediaRouteDialogListener;
 
     /**
      * Returns the namespace for an additional data namespace that this library can manage for an
@@ -186,6 +187,20 @@ public class VideoCastManager extends BaseCastManager
      */
     protected String getDataNamespace() {
         return null;
+    }
+
+    public interface MediaRouteDialogListener {
+        void onMediaRouteDialogCellClick(Context context);
+    }
+
+    public void setMediaRouteDialogListener(MediaRouteDialogListener listener) {
+        mMediaRouteDialogListener = listener;
+    }
+
+    public void onMediaRouteDialogCellClick(Context context) {
+        if (mMediaRouteDialogListener != null) {
+            mMediaRouteDialogListener.onMediaRouteDialogCellClick(context);
+        }
     }
 
     private VideoCastManager() {

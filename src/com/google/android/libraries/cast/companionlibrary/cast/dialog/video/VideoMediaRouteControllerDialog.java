@@ -301,7 +301,7 @@ public class VideoMediaRouteControllerDialog extends MediaRouteControllerDialog 
 
             @Override
             public void onClick(View v) {
-                showTargetActivity();
+                onMediaCellClick();
             }
 
         });
@@ -310,10 +310,15 @@ public class VideoMediaRouteControllerDialog extends MediaRouteControllerDialog 
 
             @Override
             public void onClick(View v) {
-                showTargetActivity();
+                onMediaCellClick();
             }
 
         });
+    }
+
+    private void onMediaCellClick() {
+        mCastManager.onMediaRouteDialogCellClick(mContext);
+        cancel();
     }
 
     private void showTargetActivity() {
