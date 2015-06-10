@@ -106,9 +106,9 @@ public class VideoMediaRouteControllerDialog extends MediaRouteControllerDialog 
 
             };
             mCastManager.addVideoCastConsumer(mCastConsumerImpl);
-            mPauseDrawable = context.getResources().getDrawable(R.drawable.ic_av_pause_sm_dark);
-            mPlayDrawable = context.getResources().getDrawable(R.drawable.ic_av_play_sm_dark);
-            mStopDrawable = context.getResources().getDrawable(R.drawable.ic_av_stop_sm_dark);
+            mPauseDrawable = context.getResources().getDrawable(R.drawable.ic_av_pause_light);
+            mStopDrawable = context.getResources().getDrawable(R.drawable.ic_av_stop_light);
+            mPlayDrawable = context.getResources().getDrawable(R.drawable.ic_av_play_light);
         } catch (IllegalStateException e) {
             LOGE(TAG, "Failed to update the content of dialog", e);
         }
@@ -157,8 +157,8 @@ public class VideoMediaRouteControllerDialog extends MediaRouteControllerDialog 
         mStreamType = info.getStreamType();
         hideControls(false, 0);
         MediaMetadata mm = info.getMetadata();
-        mTitle.setText(mm.getString(MediaMetadata.KEY_TITLE));
-        mSubTitle.setText(mm.getString(MediaMetadata.KEY_SUBTITLE));
+        mTitle.setText(mm.getString(MediaMetadata.KEY_ARTIST));
+        mSubTitle.setText(mm.getString(MediaMetadata.KEY_TITLE));
         setIcon(mm.hasImages() ? mm.getImages().get(0).getUrl() : null);
     }
 

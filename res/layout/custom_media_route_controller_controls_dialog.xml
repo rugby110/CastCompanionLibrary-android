@@ -37,12 +37,12 @@
 
     <ImageView
         android:id="@+id/playPauseView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="9dp"
-        android:src="@drawable/ic_av_pause_sm_dark"/>
+        android:src="@drawable/ic_av_pause_light"/>
 
     <ProgressBar
         android:id="@+id/loadingView"
@@ -73,13 +73,13 @@
             android:layout_alignTop="@+id/iconContainer"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="5dp"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="4dp"
             android:layout_toLeftOf="@+id/playPauseView"
             android:layout_toRightOf="@+id/iconContainer"
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="@color/ccl_mr_custom_line_1"
-            android:textSize="15sp"/>
+            android:textSize="13sp"/>
 
         <TextView
             android:id="@+id/subTitleView"
@@ -94,7 +94,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="@color/ccl_mr_custom_line_2"
-            android:textSize="13sp"/>
+            android:textSize="15sp"/>
     </LinearLayout>
 
     <TextView
