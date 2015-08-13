@@ -75,8 +75,6 @@ public class VideoCastNotificationService extends Service {
     private int mOldStatus = -1;
     private Notification mNotification;
     private boolean mVisible;
-    private boolean mIsAtLeastIcs = Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
-    private boolean mIsAtLeastLollipop = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     private VideoCastManager mCastManager;
     private VideoCastConsumerImpl mConsumer;
     private FetchBitmapTask mBitmapDecoderTask;
@@ -131,25 +129,24 @@ public class VideoCastNotificationService extends Service {
         if (intent != null) {
 
             String action = intent.getAction();
-            if (ACTION_TOGGLE_PLAYBACK.equals(action) && mIsAtLeastIcs) {
+            if (ACTION_TOGGLE_PLAYBACK.equals(action) && Utils.IS_ICS_OR_ABOVE) {
                 LOGD(TAG, "onStartCommand(): Action: ACTION_TOGGLE_PLAYBACK");
                 togglePlayback();
-            } else if (ACTION_STOP.equals(action) && mIsAtLeastIcs) {
+            } else if (ACTION_STOP.equals(action) && Utils.IS_ICS_OR_ABOVE) {
                 LOGD(TAG, "onStartCommand(): Action: ACTION_STOP");
                 stopApplication();
             } else if (ACTION_VISIBILITY.equals(action)) {
                 mVisible = intent.getBooleanExtra(NOTIFICATION_VISIBILITY, false);
                 LOGD(TAG, "onStartCommand(): Action: ACTION_VISIBILITY " + mVisible);
-                if (mVisible) {
-                    if (mNotification != null) {
-                        startForeground(NOTIFICATION_ID, mNotification);
-                    } else {
-                        try {
-                            setUpNotification(mCastManager.getRemoteMediaInformation());
-                        } catch (TransientNetworkDisconnectionException | NoConnectionException e) {
-                            LOGE(TAG, "onStartCommand() failed to get media", e);
-                        }
+                if (mNotification == null) {
+                    try {
+                        setUpNotification(mCastManager.getRemoteMediaInformation());
+                    } catch (TransientNetworkDisconnectionException | NoConnectionException e) {
+                        LOGE(TAG, "onStartCommand() failed to get media", e);
                     }
+                }
+                if (mVisible && mNotification != null) {
+                    startForeground(NOTIFICATION_ID, mNotification);
                 } else {
                     stopForeground(true);
                 }
@@ -194,7 +191,7 @@ public class VideoCastNotificationService extends Service {
                         | TransientNetworkDisconnectionException e) {
                     LOGE(TAG, "Failed to set notification for " + info.toString(), e);
                 }
-                if (mVisible) {
+                if (mVisible && (mNotification != null)) {
                     startForeground(NOTIFICATION_ID, mNotification);
                 }
                 if (this == mBitmapDecoderTask) {
@@ -261,6 +258,7 @@ public class VideoCastNotificationService extends Service {
      */
     @Override
     public void onDestroy() {
+        LOGD(TAG, "Service is destroyed");
         if (mBitmapDecoderTask != null) {
             mBitmapDecoderTask.cancel(false);
         }
@@ -278,7 +276,7 @@ public class VideoCastNotificationService extends Service {
     private RemoteViews build(MediaInfo info, Bitmap bitmap, boolean isPlaying)
             throws CastException, TransientNetworkDisconnectionException, NoConnectionException {
         Log.d(TAG, "Build version is: " + Build.VERSION.SDK_INT);
-        if (mIsAtLeastLollipop) {
+        if (Utils.IS_LOLLIPOP_OR_ABOVE) {
             buildForLollipopAndAbove(info, bitmap, isPlaying);
             return null;
         }
@@ -303,7 +301,7 @@ public class VideoCastNotificationService extends Service {
         MediaMetadata mm = info.getMetadata();
 
         RemoteViews rv = new RemoteViews(getPackageName(), R.layout.custom_notification);
-        if (mIsAtLeastIcs) {
+        if (Utils.IS_ICS_OR_ABOVE) {
             addPendingIntents(rv, isPlaying, info);
         }
         if (bitmap != null) {
@@ -365,16 +363,24 @@ public class VideoCastNotificationService extends Service {
         PendingIntent contentPendingIntent =
                 stackBuilder.getPendingIntent(NOTIFICATION_ID, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        int pauseOrStopResourceId = 0;
+        if (info.getStreamType() == MediaInfo.STREAM_TYPE_LIVE) {
+            pauseOrStopResourceId = R.drawable.ic_notification_stop_48dp;
+        } else {
+            pauseOrStopResourceId = R.drawable.ic_notification_pause_48dp;
+        }
+
         mNotification = new Notification.Builder(this)
                 .setSmallIcon(R.drawable.ic_stat_notification_cloud)
                 .setContentTitle(metadata.getString(MediaMetadata.KEY_TITLE))
                 .setContentText(castingTo)
                 .setContentIntent(contentPendingIntent)
                 .setLargeIcon(bitmap)
-                .addAction(isPlaying ? R.drawable.ic_pause_white_48dp
-                                : R.drawable.ic_play_arrow_white_48dp,
+                .addAction(isPlaying ? pauseOrStopResourceId
+                                : R.drawable.ic_notification_play_48dp,
                         getString(R.string.ccl_pause), playbackPendingIntent)
-                .addAction(R.drawable.ic_clear_white_24dp, getString(R.string.ccl_disconnect), stopPendingIntent)
+                .addAction(R.drawable.ic_notification_disconnect_24dp, getString(R.string.ccl_disconnect),
+                        stopPendingIntent)
                 .setStyle(new Notification.MediaStyle().setShowActionsInCompactView(0, 1))
                 .setOngoing(true)
                 .setShowWhen(false)
@@ -398,13 +404,13 @@ public class VideoCastNotificationService extends Service {
 
         if (isPlaying) {
             if (info.getStreamType() == MediaInfo.STREAM_TYPE_LIVE) {
-                rv.setImageViewResource(R.id.play_pause, R.drawable.ic_av_stop_sm_dark);
+                rv.setImageViewResource(R.id.play_pause, R.drawable.ic_notification_stop_24dp);
             } else {
-                rv.setImageViewResource(R.id.play_pause, R.drawable.ic_av_pause_sm_dark);
+                rv.setImageViewResource(R.id.play_pause, R.drawable.ic_notification_pause_24dp);
             }
 
         } else {
-            rv.setImageViewResource(R.id.play_pause, R.drawable.ic_av_play_sm_dark);
+            rv.setImageViewResource(R.id.play_pause, R.drawable.ic_notification_play_24dp);
         }
     }
 

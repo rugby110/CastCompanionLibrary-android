@@ -3,9 +3,9 @@
 CastCompanionLibrary-android is a library project to enable developers integrate Cast capabilities into their applications faster and easier.
 
 ## Dependencies
-* google-play-services_lib library from the Android SDK (at least version 7.0+)
+* google-play-services_lib library from the Android SDK (at least version 7.5+)
 * android-support-v7-appcompat (version 21 or above)
-* android-support-v7-mediarouter (version 20 or above)
+* android-support-v7-mediarouter (version 21 or above)
 
 ## Setup Instructions
 * Set up the project dependencies
@@ -29,6 +29,41 @@ See LICENSE
 Google Cast Developers Community on Google+ [http://goo.gl/TPLDxj](http://goo.gl/TPLDxj)
 
 ## Change List
+
+2.2
+
+ * Removed a duplicate callback (onRemoteMediaPlayerQueueStatusUpdated()) as it was a duplicate of
+ onMediaQueueUpdated(). If your code is currently using onRemoteMediaPlayerQueueStatusUpdated(), please replace that
+ with onMediaQueueUpdated() which has an identical signature.
+ * Fixed issues #185, #189 and #190. For #189, a new set of resource aliases are introduced which should make
+ replacing those resources with your own simpler.
+
+2.1.1
+
+ * Now the MediaRouter support library added back the support for the volume on the cast dialog, so CCL is hiding that again.
+ * Some typo fixes.
+
+2.1
+
+ * Added Queue related APIs for handling autoplay and queue
+ * Added "stop" button to notification and lockscreen for live streams in Lollipop and above
+ * Expanded callbacks in VideoCastConsumer interface to provide feedback on success of queue related API calls
+ * Extended the full-screen VideoCastControllerActivity to include next/previous for navigation through queues.
+  The visibility of these new buttons can be set through VideoCastManager.setNextPreviousVisibilityPolicy(policy)
+ * The MiniController now has a modified UI with an additional item for showing an upcoming media item from the queue.
+ * Addressed some issues
+
+2.0.2
+
+ * Addressing issues #171, #174
+ * DataCastConsumer.onApplicationConnectionFailed() now returns void
+
+2.0.1
+
+ * Improving the management of MediaRouteButton
+ * Working around a bug in Play Services, see issue #170
+ * Fixing a typo
+
 2.0
 #### Notice: this release introduces a restructured and updated code base that has backward-incompatible changes. Most of these changes can be handled by a simple search-and-replace action but there are some changes to the API names and signatures that may need more manual handling. Below you can find a list of changes.
 
