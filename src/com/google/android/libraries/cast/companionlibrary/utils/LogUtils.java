@@ -30,7 +30,7 @@ public class LogUtils {
     private static final int LOG_PREFIX_LENGTH = LOG_PREFIX.length();
     private static final int MAX_LOG_TAG_LENGTH = 23;
 
-    private static final boolean DEBUG = false;
+    private static boolean sDebug = false;
 
     private LogUtils() {
     }
@@ -50,58 +50,59 @@ public class LogUtils {
         return makeLogTag(cls.getSimpleName());
     }
 
-    @SuppressWarnings("unused")
-    public static final void LOGD(final String tag, String message) {
-        if (DEBUG || Log.isLoggable(tag, Log.DEBUG)) {
+    public static void LOGD(final String tag, String message) {
+        if (sDebug || Log.isLoggable(tag, Log.DEBUG)) {
             Log.d(tag, getVersionPrefix() + message);
         }
     }
 
-    @SuppressWarnings("unused")
-    public static final void LOGD(final String tag, String message, Throwable cause) {
-        if (DEBUG || Log.isLoggable(tag, Log.DEBUG)) {
+    public static void LOGD(final String tag, String message, Throwable cause) {
+        if (sDebug || Log.isLoggable(tag, Log.DEBUG)) {
             Log.d(tag, getVersionPrefix() + message, cause);
         }
     }
 
-    public static final void LOGV(final String tag, String message) {
-        if (DEBUG && Log.isLoggable(tag, Log.VERBOSE)) {
+    public static void LOGV(final String tag, String message) {
+        if (sDebug && Log.isLoggable(tag, Log.VERBOSE)) {
             Log.v(tag, getVersionPrefix() + message);
         }
     }
 
-    public static final void LOGV(final String tag, String message, Throwable cause) {
-        if (DEBUG && Log.isLoggable(tag, Log.VERBOSE)) {
+    public static void LOGV(final String tag, String message, Throwable cause) {
+        if (sDebug && Log.isLoggable(tag, Log.VERBOSE)) {
             Log.v(tag, getVersionPrefix() + message, cause);
         }
     }
 
-    public static final void LOGI(final String tag, String message) {
+    public static void LOGI(final String tag, String message) {
         Log.i(tag, getVersionPrefix() + message);
     }
 
-    public static final void LOGI(final String tag, String message, Throwable cause) {
+    public static void LOGI(final String tag, String message, Throwable cause) {
         Log.i(tag, message, cause);
     }
 
-    public static final void LOGW(final String tag, String message) {
+    public static void LOGW(final String tag, String message) {
         Log.w(tag, getVersionPrefix() + message);
     }
 
-    public static final void LOGW(final String tag, String message, Throwable cause) {
+    public static void LOGW(final String tag, String message, Throwable cause) {
         Log.w(tag, getVersionPrefix() + message, cause);
     }
 
-    public static final void LOGE(final String tag, String message) {
+    public static void LOGE(final String tag, String message) {
         Log.e(tag, getVersionPrefix() + message);
     }
 
-    public static final void LOGE(final String tag, String message, Throwable cause) {
+    public static void LOGE(final String tag, String message, Throwable cause) {
         Log.e(tag, getVersionPrefix() + message, cause);
     }
 
-    public static final String getVersionPrefix(){
+    public static String getVersionPrefix() {
         return "[v" + BaseCastManager.getCclVersion() + "] ";
     }
 
+    public static void setDebug(boolean debug) {
+        sDebug = debug;
+    }
 }

@@ -22,10 +22,12 @@ import com.google.android.libraries.cast.companionlibrary.R;
 import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
 import com.google.android.libraries.cast.companionlibrary.utils.Utils;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,14 +50,20 @@ public class TracksChooserDialog extends DialogFragment {
     private TracksListAdapter mAudioVideoAdapter;
     private List<MediaTrack> mTextTracks = new ArrayList<>();
     private List<MediaTrack> mAudioTracks = new ArrayList<>();
+    private List<MediaTrack> mVideoTracks = new ArrayList<>();
     private static final long TEXT_TRACK_NONE_ID = -1;
     private int mSelectedTextPosition = 0;
     private int mSelectedAudioPosition = -1;
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
+        // since dialog doesn't expose its root view at this point (doesn't exist yet), we cannot
+        // attach to the unknown eventual parent, so we need to pass null for the rootView parameter
+        // of the inflate() method
+        @SuppressLint("InflateParams")
         View view = inflater.inflate(R.layout.custom_tracks_dialog_layout, null);
         setUpView(view);
 
@@ -72,6 +80,26 @@ public class TracksChooserDialog extends DialogFragment {
                                 MediaTrack audioVideoTrack = mAudioVideoAdapter.getSelectedTrack();
                                 if (audioVideoTrack != null) {
                                     selectedTracks.add(audioVideoTrack);
+                                }
+                                // If there is any video tracks at all, we just add the currently
+                                // selected one, we do not offer a choice to user to select a
+                                // video track in this dialog
+                                if (!mVideoTracks.isEmpty()) {
+                                    boolean foundMatch = false;
+                                    for (MediaTrack videoTrack : mVideoTracks) {
+                                        for (Long activeTrackId : mCastManager
+                                                .getActiveTrackIds()) {
+                                            if (videoTrack.getId() == activeTrackId) {
+                                                // we found an active video track
+                                                foundMatch = true;
+                                                selectedTracks.add(videoTrack);
+                                                break;
+                                            }
+                                        }
+                                        if (foundMatch) {
+                                            break;
+                                        }
+                                    }
                                 }
                                 mCastManager.notifyTracksSelectedListeners(selectedTracks);
                                 TracksChooserDialog.this.getDialog().cancel();
@@ -177,6 +205,7 @@ public class TracksChooserDialog extends DialogFragment {
         List<MediaTrack> allTracks = mMediaInfo.getMediaTracks();
         mAudioTracks.clear();
         mTextTracks.clear();
+        mVideoTracks.clear();
         mTextTracks.add(buildNoneTrack());
         mSelectedTextPosition = 0;
         mSelectedAudioPosition = -1;
@@ -207,6 +236,8 @@ public class TracksChooserDialog extends DialogFragment {
                         }
                         audioPosition++;
                         break;
+                    case MediaTrack.TYPE_VIDEO:
+                        mVideoTracks.add(track);
                 }
             }
         }
